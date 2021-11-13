@@ -5,6 +5,9 @@ queenArray = [[0, 1, 0, 0],
  [1, 0, 0, 0], 
  [0, 0, 1, 0],];
 
+queenArray2 = [[0,1],[1,0]]; #(0,1)
+queenArray3 = [[1,0],[0,1]]; #(1,0)
+
 # print('123');
 
 def queen(list):
@@ -24,7 +27,7 @@ def queen(list):
 # 接著寫個判斷是否可放置棋子的功能
 # conflict(state, nextX)
 
-#  state = (0,) or (1,) ... (n,) , n=8
+#  state = (0,) or (1,) ... (n-1,) , n=8
 # def conflict(state, nextX):    
 #     nextY = len(state)
 #     if any(abs(state[i] - nextX)== 0 for i in range(len(state))): #同行
@@ -36,12 +39,16 @@ def queen(list):
 
 def failCheck(quennNowArray, nextQueen):
     for i in range(len(quennNowArray)):
-        
         if (quennNowArray[i]-nextQueen) == 0:
             return True
         if abs(quennNowArray[i]-nextQueen) == (len(quennNowArray)-i):
             return True
-
     return False
 
+def queens(quennNowArray, chessSize=2):
+    queenArray =[]
+    for i in range(chessSize):
+        if not failCheck(quennNowArray, i):
+            queenArray=0
 print(failCheck((3,),1));
+
