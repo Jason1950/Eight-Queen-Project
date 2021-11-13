@@ -55,8 +55,11 @@ def queens(quennNowArray=(), chessSize=2):
     queenArray =[]
     for i in range(chessSize):
         if not failCheck(quennNowArray, i):
-            print([(i,)  +i ]) # result for result in queens(quennNowArray + (i,), chessSize)])
+            print([(i,)  +(1,2) ]) # result for result in queens(quennNowArray + (i,), chessSize)])
+            for result in queens(quennNowArray + (i,), chessSize):
+                print('result',result)
             queenArray=0
+    return (i,)
 print(failCheck((3,),1));
 
 queens();
@@ -65,17 +68,47 @@ queens();
 
 # it's great function !! 
 
-# def conflict(state, nextX):    
-#     nextY = len(state)
-#     return any(abs(state[i] - nextX) in (0, nextY - i) for i in range(nextY))
+def conflict(state, nextX):    
+    nextY = len(state)
+    return any(abs(state[i] - nextX) in (0, nextY - i) for i in range(nextY))
 
-# def queens2(n, state=()):
-#     if len(state) == n: 
-#         return [()]
-#     ans = []
-#     for pos in range(n):
-#         if not conflict(state, pos):
-#             ans += [(pos,)+ result for result in queens2(n, state + (pos,))]
-#     return ans
+def queens2(n, state=()):
+    if len(state) == n: 
+        return [()]
+    ans = []
+    for pos in range(n):
+        if not conflict(state, pos):
+            ans += [(pos,)+ result for result in queens2(n, state + (pos,))]
+    return ans
 
-# print(queens2(7))
+chessSize = 8
+array1 = queens2(chessSize)
+
+print(array1[1])
+print(len(array1))
+
+
+# for i in range(chessSize):
+#     # for j in range(chessSize):
+#         if i==(chessSize-1):
+#             # print('x')
+#             if i == array1[1][0]:
+#                 print('Q')
+#             else:
+#                 print('.')
+#         else:
+#             if i == array1[1][0]:
+#                 print('Q' , end = '')
+#             else:
+#                 print('.' , end = '')
+
+for k in range(len(array1)):
+    print(f'This is the {k+1} ans!')
+    for j in range(chessSize):
+        for i in range(chessSize):
+            if i == array1[k][j]:
+                print('Q' , end = '')
+            else:
+                print('.' , end = '')
+        print('')
+    print('\n')
