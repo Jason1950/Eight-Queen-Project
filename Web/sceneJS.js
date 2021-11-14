@@ -6,11 +6,7 @@
     // *** webgl variable *** //
     let camera, scene, renderer;
     const clock = new THREE.Clock();
-    let mixer;
-    let w_mixer;
-    let action;
-    let w_action;
-    let animationArray =[];
+
     var canvas;
     let controls;
     let skytexture;
@@ -20,64 +16,45 @@
     [2, 0, 3, 1]]
     console.log(size4AnsArray[1])
 
-
-    // *** fly animation state *** //
-    let flyState = false;
-    let flyTimes = 0;
+    let chessSize=4;
 
 
-    // *** move position state  *** //
-    let movePositionConsole = [false, false];
-    let lastState = [false,false];
-    let model_position_count = [0,0];
-    let modelNewPositionArray = [0,0];
-    let modelLastPositionArray = [0,0];
-    let currentlyAnimating = [false,false];
+    let showCase = 0;
 
-
+    const loaderimg0 = new THREE.TextureLoader();
+    const bgTexture = loaderimg0.load('./3dfile/bg.png');
+    
+    let queenAnsArray = queens(chessSize)
+    console.log('queenAnsArray Ans for 4 : ',queenAnsArray);
 
     // model
     const loader = new FBXLoader();
 
-    // let cushionsInit = new THREE.TextureLoader().load('./pics/wood3.jpg');
-    // // let cushionsInit = new THREE.TextureLoader().load('./pics/wood.jpg');
-    // cushionsInit.repeat.set(20,1,1);
-    // cushionsInit.wrapS = cushionsInit.wrapT = THREE.RepeatWrapping;
-    // object11.material = new THREE.MeshPhongMaterial({map: cushionsInit, shininess: 10 })
-                
-    let chessSize=4;
-    
-
-    init(4,size4AnsArray[0]);
+    init(4,queenAnsArray[0]);
     animate();
 
-    function init(chessSize=4,arrayAns=size4AnsArray[0]) {
+    function init(chessSize=4,arrayAns) {
 
-        canvas = document.getElementById("main3-canvas");
-        console.log(canvas);
-
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-        camera.position.set( 100, 300, 350 );
-
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+        camera.position.set( 200, 200, 200 );
         scene = new THREE.Scene();
-
         const BACKGROUND_COLOR = 0xf1f1f1;
-        scene.background = new THREE.Color( 0xf5c1bd );
-        scene.background = new THREE.Color( 0xa0a0a0 );
+        // scene.background = new THREE.Color( 0xf5c1bd );
+        // scene.background = new THREE.Color( 0xa0a0a0 );
         scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-        
         // Set background
         // const canvasAspect = canvas.clientWidth / canvas.clientHeight;
         // const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
-        // const aspect = imageAspect / canvasAspect;
-        
+        // let aspect = imageAspect / canvasAspect;
+        // aspect = aspect*2.5
         // bgTexture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
         // bgTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
         
         // bgTexture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
         // bgTexture.repeat.y = aspect > 1 ? 1 : aspect;
-        // scene.background = bgTexture;
+        scene.background = bgTexture;
+        canvas = document.getElementById("main3-canvas");
 
 
         
@@ -91,7 +68,7 @@
         // skybox.name = "boxbg";
         // scene.add(skybox);
 
-        const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+        const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 ,0.7);
         hemiLight.position.set( 0, 200, 0 );
         scene.add( hemiLight );
 
@@ -103,12 +80,7 @@
         dirLight.shadow.camera.left = - 120;
         dirLight.shadow.camera.right = 120;
         scene.add( dirLight );
-
         // scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
-        // ground
-        // const mesh = new THREE.Mesh( new THREE.PlaneGeometry( cubeSize, cubeSize ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: true } ) );
-        // const mesh = new THREE.Mesh( new THREE.BoxGeometry(2000, 150,5), new THREE.MeshPhongMaterial( {map: cushionsInit, shininess: 10 } ) );
-
 
 
         const AllGroup = new THREE.Group();
@@ -138,24 +110,18 @@
                 }else{
                     chessFoolrColor ='b'
                 }
-                console.log('startColor :',startColor ,' , chessFoolrColor:',chessFoolrColor)
+                // console.log('startColor :',startColor ,' , chessFoolrColor:',chessFoolrColor)
                 tempMesh = addMesh(i,j,chessFoolrColor)
                 chessGroup.add(tempMesh);
-
             }
         }
 
-        chessGroup.name = 'chessFloorGroup';
-        // scene.add(chessGroup)
-        AllGroup.add(chessGroup)
-        console.log(chessGroup)
-        chessGroup.position.x -= cubeSize*chessSize/2 -cubeSize/2;
-        chessGroup.position.z += cubeSize*1;
+        
 
         function addMesh(row=0, col=0, color='b'){
             let c;
             if (color == 'b'){
-                c = 0xffffff
+                c = 0xE0E0E0
             }else if(color=='w'){
                 c = 0x000000
             }
@@ -163,6 +129,7 @@
             mesh3.rotation.x = - Math.PI / 2;
             mesh3.position.z -= cubeSize*row;
             mesh3.position.x += cubeSize*col;
+            // mesh3.receiveShadow = true;
             return mesh3
         }
 
@@ -195,65 +162,55 @@
                 }
             } );
 
-            console.log(object.name);
 
             object.scale.multiplyScalar(0.05);
             let sartState = true;
-            for(let i=0;i<chessSize;i++){
-                if (i%2==0) sartState = true
-                else sartState = false
-                sartState = !sartState;
-                for(let j=0;j<chessSize;j++){
-                    let tempOBJ = object.clone();
-                    tempOBJ.position.z -= cubeSize*i;
-                    tempOBJ.position.x += cubeSize*j;              
-                    // if (sartState) group.add( tempOBJ );
-                    
-                    if (Math.abs(chessSize-1-arrayAns[i])==j){
-                    group.add( tempOBJ );}
-                    // size4AnsArray[1]
-                    sartState =! sartState
-                }
-            }
-            
-            console.log('this is group :', group)
+            // console.log(arrayAns.length);
+            if(!(arrayAns===undefined))
+            {    for(let i=0;i<chessSize;i++){
+                    if (i%2==0) sartState = true
+                    else sartState = false
+                    sartState = !sartState;
+                    for(let j=0;j<chessSize;j++){
+                        let tempOBJ = object.clone();
+                        tempOBJ.position.z -= cubeSize*i;
+                        tempOBJ.position.x += cubeSize*j;              
+                        // if (sartState) group.add( tempOBJ );
+                        
+                        if (Math.abs(chessSize-arrayAns[i])==j){
+                        group.add( tempOBJ );}
+                        // size4AnsArray[1]
+                        sartState =! sartState
+                    }
+                }}
         } );
 
+        chessGroup.name = 'chessFloorGroup';
+
+
+        // console.log(chessGroup)
+        chessGroup.position.x -= cubeSize*chessSize/2 -cubeSize/2;
+        chessGroup.position.z += cubeSize*chessSize/2 -cubeSize/2;
+
         group.position.x -= cubeSize*chessSize/2 -cubeSize/2;
-        group.position.z += cubeSize*1;
+        group.position.z += cubeSize*chessSize/2 -cubeSize/2;
         group.name = 'chessQueenAll';
-        // scene.add(group)
+        AllGroup.add(chessGroup)
         AllGroup.add(group)
 
         AllGroup.name = 'allGroup'
+        AllGroup.position.y += 30
         scene.add(AllGroup)
 
 
 
-
-
-
-
-
         const grid = new THREE.GridHelper( 200, 2, 0x000000, 0x000000 );
-        grid.material.opacity = 0.2;
+        grid.material.opacity = 0.8;
         grid.material.transparent = true;
+        grid.position.y +=5;
         // scene.add( grid );
 
-        
 
-
-        
-        
-        // group.rotation.x = 4.3;
-        // group.position.y += 330;//2.5*50;
-        // group.name = "groupMan";
-        // scene.add( group );
-
-        let objman222 = scene.getObjectByName( "groupMan" );
-        // objman222.position.x = -110;
-
-        
         // ---------------- 綁定 canvas 為 自己指定的element !! --------------- //
         renderer = new THREE.WebGLRenderer({ canvas: canvas,antialias: true });
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -263,15 +220,14 @@
 
         // **** controls 畫面縮放控制 **** //
         controls = new OrbitControls( camera, renderer.domElement );
-        controls.maxPolarAngle = 1.4206431444880732; // Math.PI / 2 - 0.11;
-        controls.minPolarAngle = 1.4206431444880735; // Math.PI / 3 - 0.15;
-        controls.maxAzimuthAngle = 0;     // Math.PI  ;   // from 120 ~ -180 degree 
-        controls.minAzimuthAngle = 0  ;   // -Math.PI *2/3 ;
+        controls.maxPolarAngle =  Math.PI / 2 - 0.11;
+        controls.minPolarAngle =  Math.PI / 3 - 0.15;
+        controls.maxAzimuthAngle = Math.PI  ;   // from 120 ~ -180 degree 
+        controls.minAzimuthAngle = -Math.PI *2/3 ;
         controls.enableZoom = false;
         controls.dampingFactor = 0.1;
-        // controls.autoRotate = false; // Toggle this if you'd like the chair to automatically rotate
-        // controls.autoRotateSpeed = 0.2; // 30
         controls.target.set( 0, 100, 0 );
+        console.log(controls)
         controls.update();
         window.addEventListener( 'resize', onWindowResize );
         document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -286,23 +242,74 @@
     function animate() {
 
         const delta = clock.getDelta();
-        // const flyModel = scene.getObjectByName( "groupMan" );
         const CQA = scene.getObjectByName( "allGroup" );
         // const CFG = scene.getObjectByName( "chessFloorGroup" );
-
-        // CQA.rotation.y += 0.003
-        // CFG.rotation.y += 0.01       
+        CQA.rotation.y += 0.003
+        // CFG.rotation.y += 0.01    
 
         requestAnimationFrame( animate );
 
-        // if ( mixer ) mixer.update( delta );
-        // if (w_mixer) w_mixer.update(delta);
-
-        // flyAnimationPlay(flyModel);
-        // modelPositionMoveFix();
 
         renderer.render( scene, camera );
     }
+
+
+
+
+    // ******************************************************* //
+    //                                                         //
+    //                 queens functions                        //
+    //                                                         //
+    // ******************************************************* //
+
+    function queens(boarderSize) {
+        // 用遞迴生成一個start到end的Array
+        var interval = function (start, end) {
+            if (start > end) { return []; }
+                return interval(start, end - 1).concat(end);
+        };
+        // 檢查一個組合是否有效
+        var isValid = function (queenCol) {
+            // 檢查兩個位置是否有衝突
+            var isSafe = function (pointA, pointB) {
+            var slope = (pointA.row - pointB.row) / (pointA.col - pointB.col);
+            if ((0 === slope) || (1 === slope) || (-1 === slope)) { return false; }
+                return true;
+            };
+            var len = queenCol.length;
+            var pointToCompare = {
+            row: queenCol[len - 1],
+            col: len
+            };
+            // 先slice出除了最後一列的陣列，然後依次測試每列的點和待測點是否有衝突，最後合併測試結果
+                return queenCol.slice(0, len - 1).map(function (row, index) {
+                    return isSafe({row: row, col: index+1}, pointToCompare);
+                }).reduce(function (a, b) {
+                    return a && b;
+                });
+        };
+        // 遞迴地去一列一列生成符合規則的組合
+        var queenCols = function (size) {
+            if (1 === size) {
+                return interval(1, boarderSize).map(function (i) { return [i]; });
+            }
+                    // 先把之前所有符合規則的列組成的集合再擴充套件一列，然後用reduce降維，最後用isValid過濾掉不符合規則的組合
+                    return queenCols(size - 1)
+                    .map(function (queenCol) {
+                    return interval(1, boarderSize).map(function (row) {
+                    return queenCol.concat(row);
+                });
+            })
+            .reduce(function (a, b) {
+                return a.concat(b);
+            }).filter(isValid);
+        };
+
+
+        // queens函式入口
+        return queenCols(boarderSize);
+    };
+
 
 
     // ******************************************************* //
@@ -316,437 +323,50 @@
         // console.log('key : ', keyCode);
         if (keyCode == 90) {   
             // ******* z = 90 ********* //
-            // walkGoAndBack();
             
             chessSize += 1
-            init(chessSize,size4AnsArray[0])
+            let tempQueenAnsArray = queens(chessSize)
+            init(chessSize,tempQueenAnsArray[0])
+            showCase =0
 
         } else if (keyCode == 88) {     
             // ******* x = 88 ********* //
-            // animationPlay(action, 'left');
             chessSize -= 1
-            init(chessSize,size4AnsArray[0])
-
+            let tempQueenAnsArray = queens(chessSize)
+            init(chessSize,tempQueenAnsArray[0])
+            showCase = 0
 
         } else if (keyCode == 67) {
             // ******* c = 67 ********* //
-            // animationPlay(action, 'jump');
-            init(chessSize,size4AnsArray[0])
+            let tempQueenAnsArray = queens(chessSize)
+            // console.log('old',showCase)
+            if (showCase-1 < 0){
+                showCase=tempQueenAnsArray.length-1
+            }else{
+                showCase -= 1
+            }
+            // console.log('new',showCase)
+            console.log(`new : ${showCase} , total solution : ${tempQueenAnsArray.length} , ans : ${tempQueenAnsArray[showCase]}` )
+
+            
+            init(chessSize,tempQueenAnsArray[showCase])
+
         } else if (keyCode == 86) {
             // ******* v = 86 ********* //
-            init(chessSize,size4AnsArray[1])
-
-            // animationPlay(action, 'rokoko01');
-            // animationPlay(action, 'hello');
-
-        } else if (keyCode == 83) {
-            // ******* s = 83 ********* //
-            // animationPlay(action, 'hello');
-            walkGoOutTest('right');
-            walkGoOutTest2('right');
-
-        } else if(keyCode == 65){
-            // ******* A = 65 ********* //
-            // *** bg tweenMax change *** //
-            tweenMaxBackGround();
-
-            // *** woman and man go together *** //
-            animationPlay(action, 'right');
-            setTimeout(()=>{
-                animationPlay(w_action, 'right');
-            },300)
-
-            let object3DWoman = scene.getObjectByName( "groupWoman" );
-            console.log('object3DWoman : ', object3DWoman);
-            console.log('children : ', object3DWoman.children[0]);
-            
-            
-        }
+            let tempQueenAnsArray = queens(chessSize)
+            if (showCase+2 > tempQueenAnsArray.length){
+                showCase=0
+            }else{
+                showCase += 1
+            }
+            // console.log('new',showCase )
+            console.log(`new : ${showCase} , total solution : ${tempQueenAnsArray.length} , ans : ${tempQueenAnsArray[showCase]}` )
+            // showCase += 1
+            init(chessSize,tempQueenAnsArray[showCase])
+        } 
     };
 
-    function startAction(modelMixer, name){
-        let next = modelMixer.clipAction( animationArray.find(item=>item.name==name) );
-        let orig = modelMixer._actions[0];
-        next.reset();
-        next.play();
-        orig.crossFadeTo(next, fSpeed, false);
-    }
-
-    function endAction(modelMixer, name){
-        let next = modelMixer.clipAction( animationArray.find(item=>item.name==name) );
-        let orig = modelMixer._actions[0];
-        next.enabled = true;
-        next.crossFadeTo(orig, tSpeed, true);
-        orig.reset();
-        orig.play();
-        console.log('Action play done ...');
-    }
-
-    
-    function walkGoOutTest(name){
-        const fSpeed = 0.08, tSpeed = 0.5;
-        let object3DWoman = scene.getObjectByName( "groupWoman" );
-        // console.log(animationArray);
-        let action2 = w_mixer.clipAction( animationArray.find(item=>item.name==name) );
-        // action2.setLoop(THREE.LoopOnce);
-        action2.reset();
-        w_action.reset();
-        action2.play();
-        // console.log(action2.isRunning());
-        w_action.crossFadeTo(action2, fSpeed, false);
-        setTimeout(function() {
-            object3DWoman.position.x += object3DWoman.children[0].position.x;
-            setTimeout(function() {
-                object3DWoman.position.x += object3DWoman.children[0].position.x;
-                action2.enabled = false;
-                action2.crossFadeTo(w_action, tSpeed, false);
-                console.log('woman play ...');
-                w_action.reset();
-                w_action.play();
-
-                // *** go back *** //
-                setTimeout(function(){
-                    let action3 = w_mixer.clipAction( animationArray.find(item=>item.name=='left') );
-                    // action2.setLoop(THREE.LoopOnce);
-                    action3.reset();
-                    action3.play();
-                    // console.log(action2.isRunning());
-                    w_action.crossFadeTo(action3, fSpeed, false);
-                    setTimeout(function() {
-                        object3DWoman.position.x += object3DWoman.children[0].position.x;
-                    
-                        setTimeout(function() {
-                            object3DWoman.position.x += object3DWoman.children[0].position.x;
-                        
-                            action3.enabled = false;
-                            action3.crossFadeTo(w_action, tSpeed, false);
-                            console.log('woman play ...');
-                            w_action.reset();
-                            w_action.play();
-            
-                        },action3._clip.duration*1000);
-                    },action3._clip.duration*1000-20);
-
-
-                },2000);
-
-            },action2._clip.duration*1000-10)
-        },action2._clip.duration*1000-10)
-    }
-
-
-    function walkGoOutTest2(name){
-        const fSpeed = 0.08, tSpeed = 0.5;
-        let object3DWoman = scene.getObjectByName( "groupWoman" );
-        let object3DMan = scene.getObjectByName( "groupMan" );
-        // console.log(animationArray);
-        let action2 = mixer.clipAction( animationArray.find(item=>item.name==name) );
-        // action2.setLoop(THREE.LoopOnce);
-        action2.reset();
-        action.reset();
-        action2.play();
-        // console.log(action2.isRunning());
-        action.crossFadeTo(action2, fSpeed, false);
-        setTimeout(function() {
-            object3DMan.position.x += object3DMan.children[0].position.x;
-            setTimeout(function() {
-                object3DMan.position.x += object3DMan.children[0].position.x;
-                action2.enabled = false;
-                action2.crossFadeTo(action, tSpeed, false);
-                console.log('woman play ...');
-                action.reset();
-                action.play();
-
-                // *** go back *** //
-                setTimeout(function(){
-                    let action3 = w_mixer.clipAction( animationArray.find(item=>item.name=='left') );
-                    // action2.setLoop(THREE.LoopOnce);
-                    action3.reset();
-                    action3.play();
-                    // console.log(action2.isRunning());
-                    action.crossFadeTo(action3, fSpeed, false);
-                    setTimeout(function() {
-                        object3DMan.position.x += object3DMan.children[0].position.x;
-                    
-                        setTimeout(function() {
-                            object3DMan.position.x += object3DMan.children[0].position.x;
-                        
-                            action3.enabled = false;
-                            action3.crossFadeTo(action, tSpeed, false);
-                            console.log('woman play ...');
-                            action.reset();
-                            action.play();
-            
-                        },action3._clip.duration*1000);
-                    },action3._clip.duration*1000-20);
-
-
-                },2000);
-
-            },action2._clip.duration*1000-10)
-        },action2._clip.duration*1000-10)
-    }
-
-
-    // ******************************************************* //
-    //                                                         //
-    //         All animations fadein/out functions             //
-    //                                                         //
-    // ******************************************************* //
-
-    function animationPlay(orinAnimat, nextAnimatName){
-        const fSpeed = 0.2, tSpeed = 0.3;
-        let number = 0;
-        let nextAnimat;
-        if(orinAnimat==w_action) {
-            number=1;
-            nextAnimat = w_mixer.clipAction( animationArray.find(item=>item.name==nextAnimatName) );
-        }else{   
-            nextAnimat = mixer.clipAction( animationArray.find(item=>item.name==nextAnimatName) );
-            // console.log('mixer : ', mixer);
-            // console.log('animat : ', nextAnimat);
-        }
-        currentlyAnimating[number] = true;
-        nextAnimat.setLoop(THREE.LoopOnce);
-        nextAnimat.reset();
-        nextAnimat.play();
-        orinAnimat.crossFadeTo(nextAnimat, fSpeed, true);
-        setTimeout(()=>{
-            nextAnimat.enabled = true;
-            nextAnimat.crossFadeTo(orinAnimat, tSpeed, true);
-            
-            currentlyAnimating[number] = false;
-            console.log('play ...',number);
-            orinAnimat.reset();
-            orinAnimat.play();
-            }, nextAnimat._clip.duration * 1000 - ((tSpeed + fSpeed) * 1000)
-        );
-    }
-
-
-    // ******************************************************* //
-    //                                                         //
-    //             Fly to land down animation                  //
-    //                                                         //
-    // ******************************************************* //
-    
-    function flyAnimationPlay(flyModel){
-        if (flyModel && flyState){
-            // object3DMan.updateMatrix();
-            if(flyTimes==1)flyModel.visible = false;
-            flyModel.position.y -= 2.5;
-            console.log('move 3d model');
-            flyTimes += 1;
-            if(flyTimes ==120) {
-                // JanimationPlay('land');
-                // *** action is Specify model animation *** // 
-                // *** , and land is next play animation *** //
-                animationPlay(action, 'land');
-                flyModel.visible = true; //Invisible
-            }
-            if (flyTimes>140) {
-            flyModel.position.y = 0;
-            flyModel.rotation.y = 0;
-            flyState = !flyState;
-            flyTimes = 0;
-            // main3ButtnClick();
-            }
-        }
-    }
-
-    // ******************************************************* //
-    //                                                         //
-    //      *** Old ***   go and back function                 //
-    //                                                         //
-    // ******************************************************* //
-    
-    function walkGoAndBack() {
-        let playTime = 1400;
-        let delayTime = 300;
-
-        // *** first right *** //
-        animationPlay(action, 'right');
-        setTimeout(function(){
-            animationPlay(w_action, 'right');
-        },delayTime    );
-        
-
-        // *** second right *** //
-        setTimeout(function(){
-            animationPlay(action, 'right');
-            setTimeout(function(){
-                animationPlay(w_action, 'right');
-            },delayTime  );
-        },playTime  );
-
-        
-        // *** third right *** //
-        setTimeout(function(){
-            animationPlay(action, 'right');
-            setTimeout(function(){
-                animationPlay(w_action, 'right');
-            },delayTime );
-        },playTime*2 );
-
-        
-        // *** fourth turn back and change background *** //
-        setTimeout(function(){
-            // **** 背景 fade out **** //
-            TweenMax.to(skytexture, 3, { opacity: 0.1 });
-            setTimeout(function() {
-                // **** 背景 fade in **** //
-                changSkyTexture();
-                TweenMax.to(skytexture, 3, { opacity: 1 });
-                animationPlay(w_action,'left');
-                setTimeout(function(){
-                    animationPlay(action,'left');
-                },delayTime );
-            }, 3200);
-        },playTime*3    );
-
-
-        // *** fiveth *** //
-        setTimeout(function(){
-            animationPlay(w_action,'left');
-            setTimeout(function(){
-                animationPlay(action,'left');
-            },delayTime );
-        },playTime*4+3200    );
-
-
-        // *** sixth *** //
-        setTimeout(function(){
-            animationPlay(w_action,'left');
-            setTimeout(function(){
-                animationPlay(action,'left');
-            },delayTime );
-        },playTime*5+3200     );
-    }
-
-
-    // ******************************************************* //
-    //                   *** Old ***                           //
-    //             model  Position  Move  Fix                  //
-    //                                                         //
-    // ******************************************************* //
-
-    function modelPositionMoveFix(){
-
-        var object3DMan = scene.getObjectByName( "groupMan" );
-        var object3DWoman = scene.getObjectByName( "groupWoman" );
-
-        // *** add play animation position updating *** //
-        if(currentlyAnimating[0]) {
-            if(movePositionConsole[0]) console.log(object3DMan.children[0].position.x);
-            modelNewPositionArray[0] = object3DMan.children[0].position.x;
-        }
-        // *** add play animation position updating *** //
-        if(currentlyAnimating[1]){
-            if(movePositionConsole[1]) console.log(object3DWoman.children[0].position.x);
-            modelNewPositionArray[1] = object3DWoman.children[0].position.x;
-        }
-        
-        if(lastState[0] == !currentlyAnimating[0] && lastState[0]==true ){
-            model_position_count[0] += 1;
-        }
-
-        if(lastState[1] == !currentlyAnimating[1] && lastState[1]==true ){
-            model_position_count[1] += 1;
-        }
-
-        lastState[0] = currentlyAnimating[0];
-        lastState[1] = currentlyAnimating[1];
-        
-        if (model_position_count[0]>0 && model_position_count[0]<20){
-            if (model_position_count[0] == 1) {         
-                object3DMan.position.x += modelNewPositionArray[0];
-                modelLastPositionArray[0] =  object3DMan.position.x;
-            }
-            object3DMan.position.x = modelLastPositionArray[0];
-            if(movePositionConsole[0]) console.log('Man~',object3DMan.children[0].position.x);
-            model_position_count[0] +=1;
-        }else{
-            model_position_count[0] = 0;
-        }
-
-
-        if (model_position_count[1]>0 && model_position_count[1]<20){
-            if (model_position_count[1] == 1) {
-                object3DWoman.position.x += modelNewPositionArray[1];
-                modelLastPositionArray[1] =  object3DWoman.position.x;
-            }
-            object3DWoman.position.x = modelLastPositionArray[1];
-            if(movePositionConsole[1]) console.log('Woman!',object3DWoman.children[0].position.x);
-            model_position_count[1] +=1;
-        }else{
-            model_position_count[1] = 0;
-        }
-
-    }
-    
-    
-    // ******************************************************* //
-    //                                                         //
-    //                back ground chang funciton               //
-    //                                                         //
-    // ******************************************************* //
-
-    function changSkyTexture(){
-        let objectBox = scene.getObjectByName( "boxbg" );
-        console.log(objectBox.material.map.uuid);
-        bgArray.forEach((value,index)=>console.log(index,value.uuid));
-
-        let randBG = Math.floor(Math.random()*bgArray.length);
-        let tempTexture = eval(`bgArray[${randBG}]`);
-        
-        while(tempTexture.uuid == objectBox.material.map.uuid){
-            randBG = Math.floor(Math.random()*bgArray.length);
-            tempTexture = eval(`bgArray[${randBG}]`);
-            console.log('repeat texture !');
-        }
-        tempTexture.wrapS = THREE.RepeatWrapping;
-        tempTexture.repeat.x = - 1;
-        objectBox.material.map = tempTexture;
-    }
-
-    function tweenMaxBackGround(){
-        // **** 背景 fade out **** //
-        TweenMax.to(skytexture, 2.6, { opacity: 0.1 });
-        setTimeout(function() {
-            // **** 背景 fade in **** //
-            changSkyTexture();
-            TweenMax.to(skytexture, 3, { opacity: 1 });
-        }, 2600);
-    }
-
-
-
-     // ******************************************************* //
-    //                                                         //
-    //                Web Socket settings                      //
-    //                                                         //
-    // ******************************************************* //
-
-    let ws = new WebSocket("wss://itri-router-sstc.ngrok.io");
-    ws.onopen = () => {
-        console.log("open connection");
-    };
-    ws.onclose = () => {
-        console.log("close connection");
-    };
-    ws.onmessage = (event) => {
-        if(event.data=='action') flyState = true;
-        
-        if(event.data=='back'){
-            let manobject = scene.getObjectByName('groupMan');
-            manobject.position.y += 260;//2.5*50;
-        }
-        console.log(event);
-
-    };
-
-    
-
+ 
 
     // ******************************************************* //
     //                                                         //
@@ -754,164 +374,55 @@
     //                                                         //
     // ******************************************************* //
 
-    $("#main3-btn1-return").click(function(){
-        // alert("button");
-        flyState = true;
+    $("#main3-btn1").click(function(){
+        chessSize += 1
+        let tempQueenAnsArray = queens(chessSize)
+        init(chessSize,tempQueenAnsArray[0])
+        showCase =0
+        txtUpdate(chessSize, tempQueenAnsArray.length, showCase+1, tempQueenAnsArray[showCase])
+    }); 
+    $("#main3-btn2").click(function(){
+        chessSize -= 1
+        let tempQueenAnsArray = queens(chessSize)
+        init(chessSize,tempQueenAnsArray[0])
+        showCase = 0
+        txtUpdate(chessSize, tempQueenAnsArray.length, showCase+1, tempQueenAnsArray[showCase])
+
 
     }); 
-    $("#main3-btn2-back").click(function(){
-        // alert("button");
-        let manobject = scene.getObjectByName('groupMan');
-        manobject.position.y += 260;//2.5*50;
+    $("#main3-btn3").click(function(){
+        // ******* c = 67 ********* //
+        let tempQueenAnsArray = queens(chessSize)
+        if (showCase-1 < 0){
+            showCase=tempQueenAnsArray.length-1
+        }else{
+            showCase -= 1
+        }
+        console.log(`new : ${showCase} , total solution : ${tempQueenAnsArray.length} , ans : ${tempQueenAnsArray[showCase]}` )
+        init(chessSize,tempQueenAnsArray[showCase])
+        txtUpdate(chessSize, tempQueenAnsArray.length, showCase+1, tempQueenAnsArray[showCase])
+
+    }); 
+    $("#main3-btn4").click(function(){
+        let tempQueenAnsArray = queens(chessSize)
+        if (showCase+2 > tempQueenAnsArray.length){
+            showCase=0
+        }else{
+            showCase += 1
+        }
+        console.log(`new : ${showCase} , total solution : ${tempQueenAnsArray.length} , ans : ${tempQueenAnsArray[showCase]}` )
+        init(chessSize,tempQueenAnsArray[showCase])
+        txtUpdate(chessSize, tempQueenAnsArray.length, showCase+1, tempQueenAnsArray[showCase])
+
     }); 
 
-
-    // ******************************************** //
-    //                                              //
-    //                test animation                //
-    //                                              //
-    // ******************************************** //
-
- 
-    function JanimationPlay(name){
-        
-        const fSpeed = 0.01, tSpeed = 0.01;
-        // mixer.stopAllAction();
-        let randInt = Math.floor(Math.random() * animationArray.length);
-        // console.log(animationArray);
-        let action2 = mixer.clipAction( animationArray.find(item=>item.name==name) );
-        action2.setLoop(THREE.LoopOnce);
-        action2.reset();
-        action2.play();
-        action.crossFadeTo(action2, fSpeed, true);
-        setTimeout(function() {
-            action2.enabled = true;
-            // action2.crossFadeTo(action, tSpeed, true);
-            action2.crossFadeTo(action, tSpeed, true);
-            currentlyAnimating[0] = false;
-            console.log('play ...');
-            action.reset();
-            action.play();
-            }, action2._clip.duration * 1000 - ((tSpeed + fSpeed) * 1000));
+    function txtUpdate(size, totalAns, unmber, ans){
+        const text1 = 'This eight queens puzzle is made with webgl, html, javascript '
+        const text2 = `Chess board size : ${size} x ${size} `
+        const text3 = `The ans has : ${totalAns} `
+        const text4 = `This ans is the ( ${unmber} )'s ans , [${ans}] `
+        $("#title").html(text1 + '<br>'+ '<br>' + text2 + '<br>' + text3+ '<br>' + text4);
     }
-    
-
-    function WanimationPlay(name){
-        const fSpeed = 0.08, tSpeed = 0.5;
-        let object3DWoman = scene.getObjectByName( "groupWoman" );
-
-        // mixer.stopAllAction();
-        let randInt = Math.floor(Math.random() * animationArray.length);
-        console.log(animationArray);
-        let action2 = w_mixer.clipAction( animationArray.find(item=>item.name==name) );
-        
-        
-        // action2.setLoop(THREE.LoopOnce);
-        action2.reset();
-        action2.play();
-        console.log(action2.isRunning());
-
-        w_action.crossFadeTo(action2, fSpeed, false);
-        setTimeout(function() {
-            // action2.stop();
-            // currentlyAnimating[1] = false;
-
-            object3DWoman.position.x += object3DWoman.children[0].position.x;
-            setTimeout(function() {
-                // action2.stop();
-                // currentlyAnimating[1] = false;
-    
-                object3DWoman.position.x += object3DWoman.children[0].position.x;
-                action2.enabled = true;
-            // action2.crossFadeTo(action, tSpeed, true);
-                action2.crossFadeTo(w_action, tSpeed, true);
-                currentlyAnimating[1] = false;
-                console.log('woman play ...');
-                w_action.reset();
-                w_action.play();
-
-            },action2._clip.duration*1000-10)
-        },action2._clip.duration*1000-10)
-
-        // action2.clamWhenFinished = true;
-
-        // setTimeout(function() {
-        //     action2.enabled = true;
-        //     // action2.crossFadeTo(action, tSpeed, true);
-        //     action2.crossFadeTo(w_action, tSpeed, true);
-        //     currentlyAnimating[1] = false;
-        //     console.log('woman play ...');
-        //     w_action.reset();
-        //     w_action.play();
-        //     }, action2._clip.duration * 1000 - ((tSpeed + fSpeed) * 1000));
-    }
-
-    // ******************************************** //
-    //                                              //
-    //                mouse click                   //
-    //                                              //
-    // ******************************************** //
-
-    // window.addEventListener('touchend', e => raycast(e, true));
-    // window.addEventListener('click', e => raycast(e));
-    // function raycast(e, touch = false) {
-    // var mouse = {};
-    // if (touch) {
-    //     mouse.x = 2 * (e.changedTouches[0].clientX / window.innerWidth) - 1;
-    //     mouse.y = 1 - 2 * (e.changedTouches[0].clientY / window.innerHeight);
-    // } else {
-    //     mouse.x = 2 * (e.clientX / window.innerWidth) - 1;
-    //     mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
-    // }
-    // // update the picking ray with the camera and mouse position
-    // raycaster.setFromCamera(mouse, camera);
-    // // calculate objects intersecting the picking ray
-    // var intersects = raycaster.intersectObjects(scene.children, true);
-    // if (intersects[0]) {
-    //     var object = intersects[0].object;
-    //     // if (object.name === 'male_casualsuit06Mesh') {
-    //     // if (object.name === 'rp_eric_rigged_001_geo') {
-    //     if (object.name === 'rp_carla_rigged_001_geo') {
-    //     if (!currentlyAnimating) {
-    //         currentlyAnimating = true;
-    //         console.log('click 3d model');
-    //         JanimationPlay('left');
-    //     }
-    //     }
-    // }
-    // }
-
-
-
-    // ******************************************************* //
-    //                                                         //
-    //                Animation play setting                   //
-    //                                                         //
-    // ******************************************************* //
-
-    //   let clips = fileAnimations.filter(val => val.name !== 'idle');
-
-    //   possibleAnims = clips.map(val => {
-    //     let clip = THREE.AnimationClip.findByName(clips, val.name);
-    //     clip.tracks.splice(3, 3);
-    //     clip.tracks.splice(9, 3);
-    //     clip = mixer.clipAction(clip);
-    //     return clip;
-    //    }
-    //   );
-
-    // function playModifierAnimation(from, fSpeed, to, tSpeed) {
-    //     to.setLoop(THREE.LoopOnce);
-    //     to.reset();
-    //     to.play();
-    //     from.crossFadeTo(to, fSpeed, true);
-    //     setTimeout(function() {
-    //       from.enabled = true;
-    //       to.crossFadeTo(from, tSpeed, true);
-    //       currentlyAnimating = false;
-    //     }, to._clip.duration * 1000 - ((tSpeed + fSpeed) * 1000));
-    //   }
-
 
 
     // ******************************************************* //

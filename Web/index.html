@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>This eight queens puzzle by Jason</title>
 
     <!-- jQuery lib -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -12,9 +12,6 @@
     <!-- icon link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     
-    <!-- Step3 css -->
-    <link rel="stylesheet" href="./css/main3.css">
-
     <script type="text/javascript" src="./jsm/greensock/TweenMax.min.js"></script>
     <style>
         #fly-div{
@@ -23,7 +20,27 @@
 
         .posset{
             position: absolute;
+            /* width: 100px; */
+            width: 120px;
             
+        }
+        #main3-canvas{
+            width:100%;
+            position:absolute;
+            top: 0;
+            left: 0;
+        }
+        #title{
+            position: absolute;
+            width: 80%;
+            left: 50%;
+            top: 15%;
+            transform: translate(-50%,-50%);
+            z-index: 1;
+            text-align: center;
+            color: rgb(255, 255, 255);
+            font-size: 20px;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -31,47 +48,23 @@
 
     <!-- 第三區塊 -->
     <div class="main3">
-        <div id="main3-tilte">  </div>
+        <div id="title">This eight queens puzzle is made with webgl, html, javascript </br>
+            </br> Chess board size : 4 x 4 
+            </br> The ans has : 2 
+            </br> This ans is the (1)'s ans , [2,4,1,3]
+
+        </div>
         <div id="main3-block">
-            <div id="main3-title">Please interactive with your avatar </div>
-            <canvas id="main3-canvas" style="width:50%;position:absolute;
-            top: 0;
-            left: 0;" ></canvas>
-            <!-- <div id="main3-return">return</div> -->
-            <button class="posset" id="main3-btn1-return" ><i class="fa fa-upload" style="font-size: 22px;"></i> Down</button>
-            <button class="posset" id="main3-btn2-back" style="top:10%" ><i class="fa fa-upload" style="font-size: 22px;"></i> Back</button>
             
-            <img id="main3-qrcode" src="./pics/qrcode.png" />
-            <!-- <button id="main3-btn1-return" onclick="main3ButtnClick()"><i class="fa fa-upload" style="font-size: 22px;"></i> Upload</button> -->
-            <div id="fly-div">false</div>
+            <canvas id="main3-canvas"></canvas>
+            <!-- <div id="main3-return">return</div> -->
+            <button class="posset" id="main3-btn1" style="top:5% ;"><i class="fa fa-upload" style="font-size: 22px;"></i> Size Up</button>
+            <button class="posset" id="main3-btn2" style="top:10% ;" ><i class="fa fa-upload" style="font-size: 22px;"></i> Size Down</button>
+            <button class="posset" id="main3-btn3" style="top:15%" ><i class="fa fa-upload" style="font-size: 22px;"></i> Last Ans</button>
+            <button class="posset" id="main3-btn4" style="top:20%" ><i class="fa fa-upload" style="font-size: 22px;"></i> Next Ans</button>
         </div>    
     </div>
 
 </body>
 <script src="sceneJS.js" type="module" ></script>
-<script>
-    let stateMain3 = false;
-
-    // function main3ButtnClick (){
-    //     // let content = $("#fly-div").html()
-    //     // var isTrueSet = (content === 'true');
-    //     // $("#fly-div").html('true');
-        
-    //     // console.log('no function !',(content === 'true'));
-    //     // console.log('no function !',Boolean(parseInt(content)));
-    // }
-
-    // **********************
-    //        n o w
-    // **********************
-    // $(".main5").hide();
-    // $(".fade4").hide();
-    // $(".main3").hide();
-    // $(".main2").hide();
-    // $(".main1").hide();
-    // $('.main1').delay(3000).fadeOut(400)
-    // $('.main2').delay(3000).fadeIn(400)
-    
-</script>
-
 </html>
