@@ -16,6 +16,10 @@
     let skytexture;
     const resizePara = 1; //4/5;
 
+    const size4AnsArray = [[1, 3, 0, 2],
+    [2, 0, 3, 1]]
+    console.log(size4AnsArray[1])
+
 
     // *** fly animation state *** //
     let flyState = false;
@@ -41,12 +45,13 @@
     // cushionsInit.wrapS = cushionsInit.wrapT = THREE.RepeatWrapping;
     // object11.material = new THREE.MeshPhongMaterial({map: cushionsInit, shininess: 10 })
                 
+    let chessSize=4;
     
 
-    init();
+    init(4);
     animate();
 
-    function init() {
+    function init(chessSize=4) {
 
         canvas = document.getElementById("main3-canvas");
         console.log(canvas);
@@ -118,7 +123,7 @@
         const cubeSize = 50;
         
         let tempMesh
-        let chessSize = 5
+        // let chessSize = 5
         let chessFoolrColor = 'w'
         let startColor = true;
         for(let i=0;i<chessSize;i++){
@@ -190,12 +195,21 @@
             console.log(object.name);
 
             object.scale.multiplyScalar(0.05);
+            let sartState = true;
             for(let i=0;i<chessSize;i++){
+                if (i%2==0) sartState = true
+                else sartState = false
+                sartState = !sartState;
                 for(let j=0;j<chessSize;j++){
                     let tempOBJ = object.clone();
                     tempOBJ.position.z -= cubeSize*i;
                     tempOBJ.position.x += cubeSize*j;              
-                    group.add( tempOBJ );
+                    // if (sartState) group.add( tempOBJ );
+                    
+                    if (Math.abs(3-size4AnsArray[0][i])==j){
+                    group.add( tempOBJ );}
+                    // size4AnsArray[1]
+                    sartState =! sartState
                 }
             }
             
@@ -210,7 +224,7 @@
 
 
 
-        
+
 
         const grid = new THREE.GridHelper( 200, 2, 0x000000, 0x000000 );
         grid.material.opacity = 0.2;
@@ -288,12 +302,18 @@
         // console.log('key : ', keyCode);
         if (keyCode == 90) {   
             // ******* z = 90 ********* //
-            walkGoAndBack();
+            // walkGoAndBack();
+            
+            chessSize += 1
+            init(chessSize)
 
         } else if (keyCode == 88) {     
             // ******* x = 88 ********* //
-            animationPlay(action, 'left');
-            
+            // animationPlay(action, 'left');
+            chessSize -= 1
+            init(chessSize)
+
+
         } else if (keyCode == 67) {
             // ******* c = 67 ********* //
             animationPlay(action, 'jump');

@@ -81,9 +81,9 @@ def queens2(n, state=()):
             ans += [(pos,)+ result for result in queens2(n, state + (pos,))]
     return ans
 
-chessSize = 8
+chessSize = 4
 array1 = queens2(chessSize)
-
+print(array1[0])
 print(array1[1])
 print(len(array1))
 
