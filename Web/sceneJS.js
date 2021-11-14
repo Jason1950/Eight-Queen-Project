@@ -48,10 +48,10 @@
     let chessSize=4;
     
 
-    init(4);
+    init(4,size4AnsArray[0]);
     animate();
 
-    function init(chessSize=4) {
+    function init(chessSize=4,arrayAns=size4AnsArray[0]) {
 
         canvas = document.getElementById("main3-canvas");
         console.log(canvas);
@@ -111,6 +111,7 @@
 
 
 
+        const AllGroup = new THREE.Group();
 
 
         // ******************************************* //
@@ -144,7 +145,9 @@
             }
         }
 
-        scene.add(chessGroup)
+        chessGroup.name = 'chessFloorGroup';
+        // scene.add(chessGroup)
+        AllGroup.add(chessGroup)
         console.log(chessGroup)
         chessGroup.position.x -= cubeSize*chessSize/2 -cubeSize/2;
         chessGroup.position.z += cubeSize*1;
@@ -206,7 +209,7 @@
                     tempOBJ.position.x += cubeSize*j;              
                     // if (sartState) group.add( tempOBJ );
                     
-                    if (Math.abs(3-size4AnsArray[0][i])==j){
+                    if (Math.abs(chessSize-1-arrayAns[i])==j){
                     group.add( tempOBJ );}
                     // size4AnsArray[1]
                     sartState =! sartState
@@ -218,7 +221,13 @@
 
         group.position.x -= cubeSize*chessSize/2 -cubeSize/2;
         group.position.z += cubeSize*1;
-        scene.add(group)
+        group.name = 'chessQueenAll';
+        // scene.add(group)
+        AllGroup.add(group)
+
+        AllGroup.name = 'allGroup'
+        scene.add(AllGroup)
+
 
 
 
@@ -277,7 +286,12 @@
     function animate() {
 
         const delta = clock.getDelta();
-        const flyModel = scene.getObjectByName( "groupMan" );
+        // const flyModel = scene.getObjectByName( "groupMan" );
+        const CQA = scene.getObjectByName( "allGroup" );
+        // const CFG = scene.getObjectByName( "chessFloorGroup" );
+
+        // CQA.rotation.y += 0.003
+        // CFG.rotation.y += 0.01       
 
         requestAnimationFrame( animate );
 
@@ -305,22 +319,24 @@
             // walkGoAndBack();
             
             chessSize += 1
-            init(chessSize)
+            init(chessSize,size4AnsArray[0])
 
         } else if (keyCode == 88) {     
             // ******* x = 88 ********* //
             // animationPlay(action, 'left');
             chessSize -= 1
-            init(chessSize)
+            init(chessSize,size4AnsArray[0])
 
 
         } else if (keyCode == 67) {
             // ******* c = 67 ********* //
-            animationPlay(action, 'jump');
-
+            // animationPlay(action, 'jump');
+            init(chessSize,size4AnsArray[0])
         } else if (keyCode == 86) {
             // ******* v = 86 ********* //
-            animationPlay(action, 'rokoko01');
+            init(chessSize,size4AnsArray[1])
+
+            // animationPlay(action, 'rokoko01');
             // animationPlay(action, 'hello');
 
         } else if (keyCode == 83) {
