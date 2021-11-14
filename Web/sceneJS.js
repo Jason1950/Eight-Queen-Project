@@ -222,8 +222,8 @@
         controls = new OrbitControls( camera, renderer.domElement );
         controls.maxPolarAngle =  Math.PI / 2 - 0.11;
         controls.minPolarAngle =  Math.PI / 3 - 0.15;
-        controls.maxAzimuthAngle = Math.PI  ;   // from 120 ~ -180 degree 
-        controls.minAzimuthAngle = -Math.PI *2/3 ;
+        // controls.maxAzimuthAngle = Math.PI  ;   // from 120 ~ -180 degree 
+        // controls.minAzimuthAngle = -Math.PI *2/3 ;
         controls.enableZoom = false;
         controls.dampingFactor = 0.1;
         controls.target.set( 0, 100, 0 );
