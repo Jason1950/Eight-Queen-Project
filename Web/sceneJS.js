@@ -35,10 +35,10 @@
     // model
     const loader = new FBXLoader();
 
-    let cushionsInit = new THREE.TextureLoader().load('./pics/wood3.jpg');
-    // let cushionsInit = new THREE.TextureLoader().load('./pics/wood.jpg');
-    cushionsInit.repeat.set(20,1,1);
-    cushionsInit.wrapS = cushionsInit.wrapT = THREE.RepeatWrapping;
+    // let cushionsInit = new THREE.TextureLoader().load('./pics/wood3.jpg');
+    // // let cushionsInit = new THREE.TextureLoader().load('./pics/wood.jpg');
+    // cushionsInit.repeat.set(20,1,1);
+    // cushionsInit.wrapS = cushionsInit.wrapT = THREE.RepeatWrapping;
     // object11.material = new THREE.MeshPhongMaterial({map: cushionsInit, shininess: 10 })
                 
     
@@ -101,15 +101,69 @@
 
         // scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
+        const chessGroup = new THREE.Group();
+
+        const cubeSize = 50;
         // ground
-        // const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 200 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: true } ) );
-        const mesh = new THREE.Mesh( new THREE.BoxGeometry(2000, 150,5), new THREE.MeshPhongMaterial( {map: cushionsInit, shininess: 10 } ) );
-        
-        
+        const mesh = new THREE.Mesh( new THREE.PlaneGeometry( cubeSize, cubeSize ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: true } ) );
+        // const mesh = new THREE.Mesh( new THREE.BoxGeometry(2000, 150,5), new THREE.MeshPhongMaterial( {map: cushionsInit, shininess: 10 } ) );
         mesh.rotation.x = - Math.PI / 2;
-        mesh.receiveShadow = true;
-        mesh.position.y -= 4;
-        scene.add( mesh );
+        // mesh.receiveShadow = true;
+        // mesh.position.y -= 40;
+        // scene.add( mesh );
+
+        let tempMesh
+        let chessSize = 8
+        let chessFoolrColor = 'w'
+        let startColor = true;
+        for(let i=0;i<chessSize;i++){
+            if (i%2==0) startColor = true
+            else startColor = false
+            for(let j=0;j<chessSize;j++){
+                startColor = !startColor
+
+                if (startColor){
+                    chessFoolrColor ='w'
+                }else{
+                    chessFoolrColor ='b'
+                }
+                console.log('startColor :',startColor ,' , chessFoolrColor:',chessFoolrColor)
+                tempMesh = addMesh(i,j,chessFoolrColor)
+                chessGroup.add(tempMesh);
+                
+            }
+        }
+
+        scene.add(chessGroup)
+        // tempMesh = addMesh(1,2, 'b')
+        // scene.add(tempMesh);
+
+        // tempMesh = addMesh(1,3, 'w')
+        // scene.add(tempMesh);
+
+        // tempMesh = addMesh(2,2, 'w')
+        // scene.add(tempMesh);
+
+
+
+        function addMesh(row=0, col=0, color='b'){
+            let c;
+            if (color == 'b'){
+                c = 0xffffff
+            }else if(color=='w'){
+                c = 0x000000
+            }
+
+            const mesh3 = new THREE.Mesh( new THREE.PlaneGeometry( cubeSize, cubeSize ), new THREE.MeshPhongMaterial( { color: c, depthWrite: true } ) );
+            mesh3.rotation.x = - Math.PI / 2;
+            mesh3.position.z -= cubeSize*row;
+            mesh3.position.x += cubeSize*col;
+            // scene.add(mesh3)
+            return mesh3
+        }
+
+
+
 
         const grid = new THREE.GridHelper( 200, 2, 0x000000, 0x000000 );
         grid.material.opacity = 0.2;

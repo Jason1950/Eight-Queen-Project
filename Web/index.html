@@ -20,6 +20,11 @@
         #fly-div{
             display: none;
         }
+
+        .posset{
+            position: absolute;
+            
+        }
     </style>
 </head>
 <body>
@@ -29,10 +34,12 @@
         <div id="main3-tilte">  </div>
         <div id="main3-block">
             <div id="main3-title">Please interactive with your avatar </div>
-            <canvas id="main3-canvas" style="width:50%" ></canvas>
+            <canvas id="main3-canvas" style="width:50%;position:absolute;
+            top: 0;
+            left: 0;" ></canvas>
             <!-- <div id="main3-return">return</div> -->
-            <button id="main3-btn1-return" ><i class="fa fa-upload" style="font-size: 22px;"></i> Down</button>
-            <button id="main3-btn2-back" ><i class="fa fa-upload" style="font-size: 22px;"></i> Back</button>
+            <button class="posset" id="main3-btn1-return" ><i class="fa fa-upload" style="font-size: 22px;"></i> Down</button>
+            <button class="posset" id="main3-btn2-back" style="top:10%" ><i class="fa fa-upload" style="font-size: 22px;"></i> Back</button>
             
             <img id="main3-qrcode" src="./pics/qrcode.png" />
             <!-- <button id="main3-btn1-return" onclick="main3ButtnClick()"><i class="fa fa-upload" style="font-size: 22px;"></i> Upload</button> -->
