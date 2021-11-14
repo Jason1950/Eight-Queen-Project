@@ -2,7 +2,7 @@
     import * as THREE from './build/three.module.js';
     import { OrbitControls } from './jsm/controls/OrbitControls.js';
     import { FBXLoader } from './jsm/loaders/FBXLoader.js';
-
+    import { OBJLoader } from './jsm/loaders/OBJLoader.js';
     // *** webgl variable *** //
     let camera, scene, renderer;
     const clock = new THREE.Clock();
@@ -100,20 +100,25 @@
         scene.add( dirLight );
 
         // scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+        // ground
+        // const mesh = new THREE.Mesh( new THREE.PlaneGeometry( cubeSize, cubeSize ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: true } ) );
+        // const mesh = new THREE.Mesh( new THREE.BoxGeometry(2000, 150,5), new THREE.MeshPhongMaterial( {map: cushionsInit, shininess: 10 } ) );
+
+
+
+
+
+        // ******************************************* //
+        //                                             //
+        //                 棋盤  init                  //
+        //                                             //
+        // ******************************************* //
 
         const chessGroup = new THREE.Group();
-
         const cubeSize = 50;
-        // ground
-        const mesh = new THREE.Mesh( new THREE.PlaneGeometry( cubeSize, cubeSize ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: true } ) );
-        // const mesh = new THREE.Mesh( new THREE.BoxGeometry(2000, 150,5), new THREE.MeshPhongMaterial( {map: cushionsInit, shininess: 10 } ) );
-        mesh.rotation.x = - Math.PI / 2;
-        // mesh.receiveShadow = true;
-        // mesh.position.y -= 40;
-        // scene.add( mesh );
-
+        
         let tempMesh
-        let chessSize = 8
+        let chessSize = 5
         let chessFoolrColor = 'w'
         let startColor = true;
         for(let i=0;i<chessSize;i++){
@@ -130,21 +135,14 @@
                 console.log('startColor :',startColor ,' , chessFoolrColor:',chessFoolrColor)
                 tempMesh = addMesh(i,j,chessFoolrColor)
                 chessGroup.add(tempMesh);
-                
+
             }
         }
 
         scene.add(chessGroup)
-        // tempMesh = addMesh(1,2, 'b')
-        // scene.add(tempMesh);
-
-        // tempMesh = addMesh(1,3, 'w')
-        // scene.add(tempMesh);
-
-        // tempMesh = addMesh(2,2, 'w')
-        // scene.add(tempMesh);
-
-
+        console.log(chessGroup)
+        chessGroup.position.x -= cubeSize*chessSize/2 -cubeSize/2;
+        chessGroup.position.z += cubeSize*1;
 
         function addMesh(row=0, col=0, color='b'){
             let c;
@@ -153,31 +151,26 @@
             }else if(color=='w'){
                 c = 0x000000
             }
-
-            const mesh3 = new THREE.Mesh( new THREE.PlaneGeometry( cubeSize, cubeSize ), new THREE.MeshPhongMaterial( { color: c, depthWrite: true } ) );
+            const mesh3 = new THREE.Mesh( new THREE.BoxGeometry( cubeSize, cubeSize, 10 ), new THREE.MeshPhongMaterial( { color: c, depthWrite: true } ) );            
             mesh3.rotation.x = - Math.PI / 2;
             mesh3.position.z -= cubeSize*row;
             mesh3.position.x += cubeSize*col;
-            // scene.add(mesh3)
             return mesh3
         }
 
 
 
-
-        const grid = new THREE.GridHelper( 200, 2, 0x000000, 0x000000 );
-        grid.material.opacity = 0.2;
-        grid.material.transparent = true;
-        // scene.add( grid );
-
+        
+        // ******************************************* //
+        //                                             //
+        //             棋子 fbx  init                  //
+        //                                             //
+        // ******************************************* //
         
         const group = new THREE.Group();
-        const group2 = new THREE.Group();
-
-
-        loader.load( './3dfile/man.fbx', function ( object ) {
+        loader.load( './3dfile/woodChessFBX.fbx', function ( object ) {
             // **** texture loading **** //
-            const man_txt = new THREE.TextureLoader().load('./pics/man.jpg');
+            const man_txt = new THREE.TextureLoader().load('./3dfile/WoodenChessQueen.jpg');
             man_txt.flipY = true; // we flip the texture so that its the right way up
             const man_mtl = new THREE.MeshPhongMaterial({
                 map: man_txt,
@@ -185,11 +178,7 @@
                 skinning: true
             });
 
-            mixer = new THREE.AnimationMixer( object );
-            // action = mixer.clipAction( object.animations[0] );
-            console.log(animationArray);
-            action = mixer.clipAction( animationArray.find(item=>item.name=='idle') );
-            action.play();
+           
             object.traverse( function ( child ) {
                 if ( child.isMesh ) {
                     child.castShadow = true;
@@ -199,16 +188,46 @@
             } );
 
             console.log(object.name);
-            // scene.add( object );
-            group.add( object );
+
+            object.scale.multiplyScalar(0.05);
+            for(let i=0;i<chessSize;i++){
+                for(let j=0;j<chessSize;j++){
+                    let tempOBJ = object.clone();
+                    tempOBJ.position.z -= cubeSize*i;
+                    tempOBJ.position.x += cubeSize*j;              
+                    group.add( tempOBJ );
+                }
+            }
+            
+            console.log('this is group :', group)
         } );
 
+        group.position.x -= cubeSize*chessSize/2 -cubeSize/2;
+        group.position.z += cubeSize*1;
+        scene.add(group)
+
+
+
+
+
+        
+
+        const grid = new THREE.GridHelper( 200, 2, 0x000000, 0x000000 );
+        grid.material.opacity = 0.2;
+        grid.material.transparent = true;
+        // scene.add( grid );
+
+        
+
+
+        
+        
         // group.rotation.x = 4.3;
         // group.position.y += 330;//2.5*50;
-        group.name = "groupMan";
-        scene.add( group );
+        // group.name = "groupMan";
+        // scene.add( group );
 
-        // let objman222 = scene.getObjectByName( "groupMan" );
+        let objman222 = scene.getObjectByName( "groupMan" );
         // objman222.position.x = -110;
 
         
