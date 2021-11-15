@@ -173,11 +173,11 @@
                     sartState = !sartState;
                     for(let j=0;j<chessSize;j++){
                         let tempOBJ = object.clone();
-                        tempOBJ.position.z -= cubeSize*i;
+                        tempOBJ.position.z -= cubeSize*(chessSize-i-1);
                         tempOBJ.position.x += cubeSize*j;              
                         // if (sartState) group.add( tempOBJ );
                         
-                        if (Math.abs(chessSize-arrayAns[i])==j){
+                        if (Math.abs((arrayAns[i]-1))==j){
                         group.add( tempOBJ );}
                         // size4AnsArray[1]
                         sartState =! sartState
