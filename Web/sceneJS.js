@@ -18,7 +18,7 @@
 
     let chessSize=4;
 
-
+    let rotationDegree = 0;
     let showCase = 0;
 
     const loaderimg0 = new THREE.TextureLoader();
@@ -200,9 +200,8 @@
 
         AllGroup.name = 'allGroup'
         AllGroup.position.y += 30
+        AllGroup.rotation.y = rotationDegree;
         scene.add(AllGroup)
-
-
 
         const grid = new THREE.GridHelper( 200, 2, 0x000000, 0x000000 );
         grid.material.opacity = 0.8;
@@ -245,6 +244,8 @@
         const CQA = scene.getObjectByName( "allGroup" );
         // const CFG = scene.getObjectByName( "chessFloorGroup" );
         CQA.rotation.y += 0.003
+        rotationDegree = CQA.rotation.y
+
         // CFG.rotation.y += 0.01    
 
         requestAnimationFrame( animate );
